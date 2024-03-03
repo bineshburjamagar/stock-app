@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -80,12 +81,62 @@ class WatchListDetailPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20.0),
-          if (chartModel != null)
-            WatchListChartWidget(
-              chartModel: chartModel,
-              chartType: chartType,
-              ticker: watchListModel.ticker ?? '',
+          if (chartModel != null) ...[
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  height: 200.0,
+                  child: WatchListChartWidget(
+                    chartDatum: chartModel.chartData,
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ...chartTypeModelList.map((e) {
+                      return InkWell(
+                        onTap: () {
+                          ref
+                              .read(
+                            chartModelProvider(
+                                    chartType: e.title,
+                                    ticker: watchListModel.ticker ?? "")
+                                .future,
+                          )
+                              .then((value) {
+                            BotToast.closeAllLoading();
+                            ref
+                                .read(chartProvider.notifier)
+                                .update((state) => value);
+
+                            ref
+                                .read(activeChart.notifier)
+                                .update((state) => e.chartType);
+                          }).onError((error, stackTrace) {
+                            BotToast.closeAllLoading();
+                            BotToast.showText(text: 'Something went wrong');
+                          });
+                        },
+                        child: Container(
+                          color: chartType == e.chartType
+                              ? Colors.black.withOpacity(0.2)
+                              : null,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 5.0),
+                          child: Text(
+                            e.title.toUpperCase(),
+                            style: const TextStyle(fontSize: 16.0),
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                )
+              ],
             ),
+          ],
           const SizedBox(height: 20.0),
           secStats.when(data: (data) {
             return Column(
@@ -123,7 +174,7 @@ class WatchListDetailPage extends ConsumerWidget {
 
   Widget _buildStatsData({
     required String title,
-    required int data,
+    required num data,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

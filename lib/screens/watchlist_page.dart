@@ -6,7 +6,6 @@ import 'package:stock_app/core/apis/apis.dart';
 import 'package:stock_app/core/models/models.dart';
 import 'package:stock_app/screens/screens.dart';
 import 'package:stock_app/widgets/widgets.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class WatchListPage extends ConsumerWidget {
   const WatchListPage({super.key});
@@ -36,7 +35,16 @@ class WatchListPage extends ConsumerWidget {
               },
             )
           else
-            const Center(child: Text('No Selected Tickers')),
+            const Center(
+                child: Padding(
+              padding: EdgeInsets.only(top: 200.0),
+              child: Text(
+                'No Selected Tickers',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            )),
         ],
       ),
     );
@@ -129,24 +137,11 @@ class WatchListPage extends ConsumerWidget {
             ),
           ),
           title: SizedBox(
-            width: 50.0,
-            height: 50.0,
-            child: SfCartesianChart(
-              plotAreaBorderWidth: 0,
-              primaryXAxis: const DateTimeAxis(
-                isVisible: false,
-                majorGridLines: MajorGridLines(width: 0),
-                edgeLabelPlacement: EdgeLabelPlacement.hide,
-                interactiveTooltip: InteractiveTooltip(),
-              ),
-              primaryYAxis: const NumericAxis(
-                axisLine: AxisLine(width: 0),
-                isVisible: false,
-                majorTickLines: MajorTickLines(width: 0),
-              ),
-              series: getDefaultCrossHairSeries(data: e.chartData),
-            ),
-          ),
+              width: 50.0,
+              height: 50.0,
+              child: WatchListChartWidget(
+                chartDatum: e.chartData,
+              )),
           trailing: SizedBox(
             width: 100.0,
             child: Column(
@@ -186,17 +181,6 @@ class WatchListPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  List<LineSeries<ChartDatum, DateTime>> getDefaultCrossHairSeries({
-    required List<ChartDatum> data,
-  }) {
-    return <LineSeries<ChartDatum, DateTime>>[
-      LineSeries<ChartDatum, DateTime>(
-          dataSource: data,
-          xValueMapper: (ChartDatum sales, _) => sales.timestamp,
-          yValueMapper: (ChartDatum sales, _) => sales.value)
-    ];
   }
 
   Row _buildAddAndRemoveTicker(BuildContext context, WidgetRef ref) {

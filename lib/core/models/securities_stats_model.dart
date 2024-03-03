@@ -1,11 +1,11 @@
 class SecuritiesStatsModel {
   final String ticker;
-  final int ltp;
-  final double pointChange;
-  final double percentageChange;
-  final double volume;
-  final int sharesTraded;
-  final int marketCap;
+  final num ltp;
+  final num pointChange;
+  final num percentageChange;
+  final num volume;
+  final num sharesTraded;
+  final num marketCap;
   final String updatedOn;
 
   SecuritiesStatsModel({
